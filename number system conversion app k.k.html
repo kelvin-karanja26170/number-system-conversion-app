@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kelvin — number system converter</title>
+<meta name="theme-color" content="#1b2026">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Kelvin">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%231b2026'/%3E%3Ctext x='32' y='44' font-family='monospace' font-size='34' font-weight='700' text-anchor='middle' fill='%23f2a33c'%3EK%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' fill='%231b2026'/%3E%3Ctext x='90' y='124' font-family='monospace' font-size='96' font-weight='700' text-anchor='middle' fill='%23f2a33c'%3EK%3C/text%3E%3C/svg%3E">
+<link rel="manifest" href='data:application/manifest+json,{"name":"Kelvin","short_name":"Kelvin","start_url":".","display":"standalone","background_color":"%231b2026","theme_color":"%231b2026","icons":[{"src":"data:image/svg%2Bxml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 512 512%27%3E%3Crect width=%27512%27 height=%27512%27 fill=%27%231b2026%27/%3E%3Ctext x=%27256%27 y=%27352%27 font-family=%27monospace%27 font-size=%27272%27 font-weight=%27700%27 text-anchor=%27middle%27 fill=%27%23f2a33c%27%3EK%3C/text%3E%3C/svg%3E","sizes":"512x512","type":"image/svg+xml","purpose":"any"}]}'>
+<style>
+  :root{
+    color-scheme: dark;
+    --steel-900:#14181d;
+    --steel-800:#1b2026;
+    --steel-700:#242b33;
+    --steel-600:#333c46;
+    --steel-line:#3f4a56;
+    --ink:#e7ecf1;
+    --ink-dim:#93a1b0;
+    --amber:#f2a33c;
+    --amber-soft:#c97f22;
+    --glass:#0d1014;
+    --bad:#e2643f;
+    box-sizing:border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  *,*::before,*::after{box-sizing:inherit}
+  html{scroll-padding-top: env(safe-area-inset-top, 0px);}
+  body{
+    margin:0;
+    font-family:"Saira Condensed","Arial Narrow",Helvetica,Arial,sans-serif;
+    color:var(--ink);
+    background-color:var(--steel-800);
+    background-image:
+      repeating-linear-gradient(94deg, rgba(255,255,255,.028) 0 1px, rgba(0,0,0,.05) 1px 3px),
+      radial-gradient(120% 70% at 50% -10%, #39434f 0%, #232a32 45%, #14181d 100%);
+    background-attachment:fixed;
+    min-height:100vh;
+    -webkit-text-size-adjust:100%;
+  }
+  .plate{max-width:760px;margin:0 auto;padding:28px 18px 64px}
+  header.mast{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;padding-bottom:14px;border-bottom:2px solid var(--steel-line)}
+  .wordmark{margin:0;font-size:clamp(40px,11vw,68px);font-weight:700;letter-spacing:.06em;line-height:.9;color:var(--ink);text-shadow:0 1px 0 #566372, 0 -1px 0 #0b0e11}
+  .wordmark span{color:var(--amber)}
+  .tagline{margin:0 0 6px;font-size:15px;color:var(--ink-dim);max-width:26ch;text-align:right;line-height:1.25}
+
+  .selector{margin:22px 0 18px;display:grid;grid-template-columns:auto 1fr;gap:10px 14px;align-items:center}
+  .selector .lead{font-size:17px;color:var(--ink-dim);white-space:nowrap}
+  .rail{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{
+    font-family:"IBM Plex Mono",ui-monospace,monospace;
+    font-size:13px;font-weight:600;letter-spacing:.02em;
+    padding:9px 14px;border-radius:3px;cursor:pointer;color:var(--ink-dim);
+    background:linear-gradient(180deg,var(--steel-700),#1d232a);
+    border:1px solid var(--steel-line);border-top-color:#4d5a68;
+  }
+  .chip:hover{color:var(--ink)}
+  .chip[aria-pressed="true"]{color:var(--steel-900);background:linear-gradient(180deg,var(--amber),var(--amber-soft));border-color:#8a5510}
+  .chip.ghost{opacity:.4}
+  .chip:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+
+  .console{border:1px solid var(--steel-line);border-radius:6px;background:linear-gradient(180deg,#2a323b,#1c2229);box-shadow:inset 0 1px 0 #55616f, 0 10px 30px rgba(0,0,0,.45);padding:20px 18px}
+  label.field{display:block;font-size:16px;color:var(--ink-dim);margin:0 0 7px}
+  input[type=text]{
+    width:100%;font-family:"IBM Plex Mono",ui-monospace,monospace;
+    font-size:clamp(20px,5.4vw,28px);font-weight:600;letter-spacing:.06em;color:var(--amber);
+    background:var(--glass);border:1px solid #000;box-shadow:inset 0 2px 8px rgba(0,0,0,.7);border-radius:4px;padding:14px;
+  }
+  input.invalid{color:var(--bad)}
+  .hint{margin:8px 0 0;font-size:15px;color:var(--ink-dim);min-height:1.4em}
+  .hint.error{color:var(--bad)}
+
+  .readout{margin-top:18px;background:var(--glass);border:1px solid #000;border-radius:4px;box-shadow:inset 0 2px 10px rgba(0,0,0,.75);padding:16px 14px;overflow-x:auto}
+  .readout .cap{font-size:15px;color:var(--ink-dim);margin:0 0 6px}
+  .readout output{display:block;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:clamp(22px,6.6vw,34px);font-weight:600;letter-spacing:.08em;color:var(--amber);text-shadow:0 0 16px rgba(242,163,60,.35);white-space:nowrap}
+
+  table.all{width:100%;border-collapse:collapse;margin-top:16px;font-size:15px}
+  table.all th{text-align:left;font-weight:500;color:var(--ink-dim);padding:7px 10px 7px 0;width:9.5em;border-bottom:1px solid var(--steel-line)}
+  table.all td{font-family:"IBM Plex Mono",monospace;font-size:14px;color:var(--ink);padding:7px 0;border-bottom:1px solid var(--steel-line);word-break:break-all}
+  table.all tr.live td, table.all tr.live th{color:var(--amber)}
+
+  .actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+  button.act{font-family:"Saira Condensed",sans-serif;font-size:17px;font-weight:600;padding:10px 18px;border-radius:4px;cursor:pointer;color:var(--ink);background:linear-gradient(180deg,var(--steel-600),#242b33);border:1px solid var(--steel-line);border-top-color:#55616f}
+  button.act:active{transform:translateY(1px)}
+  button.act.primary{color:var(--steel-900);background:linear-gradient(180deg,var(--amber),var(--amber-soft));border-color:#8a5510}
+
+  details.work{margin-top:22px;border-top:1px solid var(--steel-line);padding-top:14px}
+  details.work summary{cursor:pointer;font-size:17px;color:var(--ink-dim)}
+  details.work summary:hover{color:var(--ink)}
+  ol.steps{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:14px;line-height:1.7;color:var(--ink);padding-left:22px;margin:12px 0 0;overflow-x:auto}
+  ol.steps li{margin-bottom:4px}
+  ol.steps li::marker{color:var(--amber)}
+
+  .pad{display:grid;grid-template-columns:repeat(6,1fr);gap:7px;margin-top:16px}
+  .pad button{font-family:"IBM Plex Mono",monospace;font-size:17px;font-weight:600;padding:12px 0;border-radius:4px;cursor:pointer;color:var(--ink);background:linear-gradient(180deg,#39424d,#262d35);border:1px solid var(--steel-line);border-top-color:#5a6775}
+  .pad button:disabled{opacity:.25;cursor:not-allowed}
+  .pad button.wide{grid-column:span 2;color:var(--amber)}
+  .pad button:active{transform:translateY(1px)}
+
+  footer.install{margin-top:34px;font-size:15px;color:var(--ink-dim);line-height:1.55;max-width:66ch}
+  footer.install h2{font-size:19px;color:var(--ink);margin:0 0 6px;font-weight:600}
+  footer.install p{margin:0 0 8px}
+  @media (max-width:520px){ .selector{grid-template-columns:1fr;gap:6px} .selector .lead{margin-top:6px} }
+  @media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main class="plate">
+  <header class="mast">
+    <h1 class="wordmark">Kelvin<span>.</span></h1>
+    <p class="tagline">Binary, octal, decimal and hexadecimal, in every direction.</p>
+  </header>
+
+  <div class="selector">
+    <span class="lead" id="fromLead">Convert from</span>
+    <div class="rail" id="fromRail" role="group" aria-labelledby="fromLead"></div>
+    <span class="lead" id="toLead">Convert to</span>
+    <div class="rail" id="toRail" role="group" aria-labelledby="toLead"></div>
+  </div>
+
+  <section class="console">
+    <label class="field" for="src" id="srcLabel">Binary value</label>
+    <input id="src" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="1011.101">
+    <p class="hint" id="hint">Digits allowed: 0 1. A point is fine for fractions.</p>
+
+    <div class="readout">
+      <p class="cap" id="outLabel">Octal result</p>
+      <output id="out" for="src">—</output>
+    </div>
+
+    <table class="all" id="allTable">
+      <tbody>
+        <tr data-base="2"><th scope="row">Binary</th><td>—</td></tr>
+        <tr data-base="8"><th scope="row">Octal</th><td>—</td></tr>
+        <tr data-base="10"><th scope="row">Decimal</th><td>—</td></tr>
+        <tr data-base="16"><th scope="row">Hexadecimal</th><td>—</td></tr>
+      </tbody>
+    </table>
+
+    <div class="actions">
+      <button class="act primary" id="copy">Copy result</button>
+      <button class="act" id="swap">Reverse direction</button>
+      <button class="act" id="clear">Clear</button>
+    </div>
+
+    <div class="pad" id="pad" aria-label="Keypad"></div>
+
+    <details class="work">
+      <summary>Show the working</summary>
+      <ol class="steps" id="steps"><li>Enter a value to see each step.</li></ol>
+    </details>
+  </section>
+
+  <footer class="install">
+    <h2>Keep it on your phone</h2>
+    <p>Android: open this page in Chrome, tap the three-dot menu, then Add to Home screen.</p>
+    <p>iPhone or iPad: open it in Safari, tap the share button, then Add to Home Screen.</p>
+    <p>It then launches full screen from its own icon and keeps working with no network.</p>
+  </footer>
+</main>
+
+<script>
+(function(){
+  var DIGITS = "0123456789ABCDEF";
+  var BASES = [2,8,10,16];
+  var NAME = {2:"Binary", 8:"Octal", 10:"Decimal", 16:"Hexadecimal"};
+  var SHORT = {2:"BIN", 8:"OCT", 10:"DEC", 16:"HEX"};
+  var PLACEHOLDER = {2:"1011.101", 8:"725", 10:"2026", 16:"2F9"};
+  var FRAC_LIMIT = 16;
+
+  var state = {from:2, to:8};
+  var srcEl   = document.getElementById("src");
+  var outEl   = document.getElementById("out");
+  var hintEl  = document.getElementById("hint");
+  var stepsEl = document.getElementById("steps");
+  var padEl   = document.getElementById("pad");
+  var tableEl = document.getElementById("allTable");
+
+  function digitValue(ch){ return DIGITS.indexOf(ch.toUpperCase()); }
+
+  function validate(raw, base){
+    var s = raw.trim().toUpperCase();
+    if(!s) return {ok:false, empty:true};
+    var neg = false;
+    if(s[0]==="+" || s[0]==="-"){ neg = (s[0]==="-"); s = s.slice(1); }
+    var parts = s.split(".");
+    if(parts.length > 2) return {ok:false, msg:"Only one point is allowed."};
+    if(parts[0]==="" && (parts.length===1 || parts[1]==="")) return {ok:false, msg:"Enter at least one digit."};
+    for(var i=0;i<s.length;i++){
+      var ch = s[i];
+      if(ch===".") continue;
+      var v = digitValue(ch);
+      if(v < 0 || v >= base) return {ok:false, msg:"\u201c"+ch+"\u201d is not a "+NAME[base].toLowerCase()+" digit."};
+    }
+    return {ok:true, neg:neg, intPart:parts[0]||"0", fracPart:parts[1]||""};
+  }
+
+  function intToDecimal(str, base){
+    var b = BigInt(base), acc = 0n;
+    for(var i=0;i<str.length;i++) acc = acc*b + BigInt(digitValue(str[i]));
+    return acc;
+  }
+  function fracToDecimal(str, base){
+    var acc = 0, p = 1/base;
+    for(var i=0;i<str.length;i++){ acc += digitValue(str[i])*p; p /= base; }
+    return acc;
+  }
+  function decimalToInt(n, base){
+    if(n === 0n) return "0";
+    var b = BigInt(base), out = "";
+    while(n > 0n){ out = DIGITS[Number(n % b)] + out; n = n / b; }
+    return out;
+  }
+  function decimalToFrac(f, base){
+    var out = "", guard = 0;
+    while(f > 0 && guard < FRAC_LIMIT){
+      f *= base;
+      var d = Math.floor(f);
+      out += DIGITS[d];
+      f -= d; guard++;
+    }
+    return out;
+  }
+  function render(v, from, to){
+    var whole = intToDecimal(v.intPart, from);
+    var frac  = v.fracPart ? fracToDecimal(v.fracPart, from) : 0;
+    var fr    = frac ? decimalToFrac(frac, to) : "";
+    return (v.neg ? "-" : "") + decimalToInt(whole, to) + (fr ? "." + fr : "");
+  }
+
+  function expansion(str, base){
+    var terms = [], n = str.length;
+    for(var i=0;i<n;i++) terms.push(digitValue(str[i]) + "x" + base + "^" + (n-1-i));
+    return terms.join(" + ");
+  }
+  function divisionSteps(n, base){
+    var lines = [], b = BigInt(base), guard = 0;
+    if(n === 0n) return ["0 \u00f7 " + base + " = 0 remainder 0"];
+    while(n > 0n && guard < 400){
+      lines.push(n + " \u00f7 " + base + " = " + (n/b) + " remainder " + DIGITS[Number(n%b)]);
+      n = n/b; guard++;
+    }
+    lines.push("Read the remainders bottom to top.");
+    return lines;
+  }
+  function groupNote(from, to){
+    if(from===2 && to===8)  return "Shortcut: group the bits in threes from the point outwards \u2014 each group is one octal digit.";
+    if(from===2 && to===16) return "Shortcut: group the bits in fours from the point outwards \u2014 each group is one hex digit.";
+    if(from===8 && to===2)  return "Shortcut: expand each octal digit into 3 bits.";
+    if(from===16 && to===2) return "Shortcut: expand each hex digit into 4 bits.";
+    if(from===8 && to===16) return "Shortcut: octal \u2192 bits in threes \u2192 regroup the bits in fours \u2192 hex.";
+    if(from===16 && to===8) return "Shortcut: hex \u2192 bits in fours \u2192 regroup the bits in threes \u2192 octal.";
+    return null;
+  }
+  function buildSteps(v, from, to, result){
+    var lines = [];
+    var whole = intToDecimal(v.intPart, from);
+    if(from !== 10){
+      lines.push("Expand by place value: " + expansion(v.intPart, from));
+      lines.push("Whole part in decimal = " + whole);
+    } else {
+      lines.push("Whole part is already decimal: " + whole);
+    }
+    if(v.fracPart){
+      lines.push("Fraction \u00b7" + v.fracPart + " in decimal \u2248 " + fracToDecimal(v.fracPart, from).toFixed(8));
+    }
+    if(to !== 10){
+      lines.push("Divide the whole part by " + to + ", keeping remainders:");
+      divisionSteps(whole, to).forEach(function(l){ lines.push("   " + l); });
+      if(v.fracPart) lines.push("Multiply the fraction by " + to + " repeatedly and read the whole parts downwards.");
+    } else {
+      lines.push("The target is decimal, so the expanded value is the answer.");
+    }
+    var note = groupNote(from, to);
+    if(note) lines.push(note);
+    lines.push("Result: " + result + " in " + NAME[to].toLowerCase() + ".");
+    return lines;
+  }
+
+  function buildPad(){
+    padEl.innerHTML = "";
+    for(var i=0;i<16;i++){
+      (function(i){
+        var b = document.createElement("button");
+        b.type = "button";
+        b.textContent = DIGITS[i];
+        b.disabled = i >= state.from;
+        b.addEventListener("click", function(){ insert(DIGITS[i]); });
+        padEl.appendChild(b);
+      })(i);
+    }
+    var dot = document.createElement("button");
+    dot.type="button"; dot.className="wide"; dot.textContent=".";
+    dot.addEventListener("click", function(){ insert("."); });
+    padEl.appendChild(dot);
+    var del = document.createElement("button");
+    del.type="button"; del.className="wide"; del.textContent="\u232b";
+    del.setAttribute("aria-label","Delete last character");
+    del.addEventListener("click", function(){ srcEl.value = srcEl.value.slice(0,-1); run(); });
+    padEl.appendChild(del);
+  }
+  function insert(ch){ srcEl.value += ch; run(); }
+
+  function buildRails(){
+    [["fromRail","from"],["toRail","to"]].forEach(function(pair){
+      var rail = document.getElementById(pair[0]), side = pair[1];
+      rail.innerHTML = "";
+      BASES.forEach(function(b){
+        var c = document.createElement("button");
+        c.type = "button";
+        c.className = "chip";
+        c.textContent = SHORT[b] + " \u00b7 base " + b;
+        c.dataset.base = b;
+        c.addEventListener("click", function(){ pick(side, b); });
+        rail.appendChild(c);
+      });
+    });
+  }
+  function pick(side, base){
+    if(side === "from"){
+      if(base === state.to) state.to = state.from;   // picking the target as source swaps them
+      state.from = base;
+    } else {
+      if(base === state.from) state.from = state.to;
+      state.to = base;
+    }
+    applyMode();
+    srcEl.focus();
+  }
+  function applyMode(){
+    document.querySelectorAll("#fromRail .chip").forEach(function(c){
+      var on = (+c.dataset.base === state.from);
+      c.setAttribute("aria-pressed", on ? "true" : "false");
+      c.classList.toggle("ghost", +c.dataset.base === state.to);
+    });
+    document.querySelectorAll("#toRail .chip").forEach(function(c){
+      var on = (+c.dataset.base === state.to);
+      c.setAttribute("aria-pressed", on ? "true" : "false");
+      c.classList.toggle("ghost", +c.dataset.base === state.from);
+    });
+    document.getElementById("srcLabel").textContent = NAME[state.from] + " value";
+    document.getElementById("outLabel").textContent = NAME[state.to] + " result";
+    srcEl.setAttribute("placeholder", PLACEHOLDER[state.from]);
+    buildPad();
+    run();
+  }
+
+  function fillTable(v){
+    tableEl.querySelectorAll("tr").forEach(function(tr){
+      var base = +tr.dataset.base;
+      tr.classList.toggle("live", base === state.to);
+      tr.querySelector("td").textContent = v ? render(v, state.from, base) : "\u2014";
+    });
+  }
+
+  function run(){
+    var v = validate(srcEl.value, state.from);
+    if(v.empty){
+      srcEl.classList.remove("invalid"); hintEl.classList.remove("error");
+      hintEl.textContent = "Digits allowed: " + DIGITS.slice(0,state.from).split("").join(" ") + ". A point is fine for fractions.";
+      outEl.textContent = "\u2014";
+      fillTable(null);
+      stepsEl.innerHTML = "<li>Enter a value to see each step.</li>";
+      return;
+    }
+    if(!v.ok){
+      srcEl.classList.add("invalid"); hintEl.classList.add("error");
+      hintEl.textContent = v.msg;
+      outEl.textContent = "\u2014";
+      fillTable(null);
+      stepsEl.innerHTML = "<li>Fix the input to see the working.</li>";
+      return;
+    }
+    srcEl.classList.remove("invalid"); hintEl.classList.remove("error");
+    hintEl.textContent = "Digits allowed: " + DIGITS.slice(0,state.from).split("").join(" ") + ".";
+    var result = render(v, state.from, state.to);
+    outEl.textContent = result;
+    fillTable(v);
+    stepsEl.innerHTML = "";
+    buildSteps(v, state.from, state.to, result).forEach(function(line){
+      var li = document.createElement("li");
+      li.textContent = line;
+      stepsEl.appendChild(li);
+    });
+  }
+
+  srcEl.addEventListener("input", run);
+  document.getElementById("clear").addEventListener("click", function(){ srcEl.value=""; run(); srcEl.focus(); });
+  document.getElementById("swap").addEventListener("click", function(){
+    var val = outEl.textContent;
+    var f = state.from; state.from = state.to; state.to = f;
+    applyMode();
+    if(val && val !== "\u2014"){ srcEl.value = val; run(); }
+  });
+  document.getElementById("copy").addEventListener("click", function(){
+    var txt = outEl.textContent, btn = this;
+    if(!txt || txt === "\u2014") return;
+    var done = function(){ btn.textContent = "Copied"; setTimeout(function(){ btn.textContent = "Copy result"; }, 1400); };
+    if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(done, done); }
+    else { done(); }
+  });
+
+  buildRails();
+  applyMode();
+})();
+</script>
+</body>
+</html>
