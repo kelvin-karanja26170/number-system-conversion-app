@@ -1,0 +1,890 @@
+KELVIN NUMBER SYSTEM CONVERTER
+FULL ALGORITHM AND COMPLETE PSEUDOCODE
+
+1. APPLICATION PURPOSE
+
+The application converts numbers between Binary (base 2), Octal (base 8),
+Decimal (base 10), and Hexadecimal (base 16). It accepts whole numbers,
+fractions, and optional positive/negative signs. It validates input, displays
+the result in the selected target base, shows equivalent values in all four
+bases, and displays the conversion working steps.
+
+2. COMPLETE ALGORITHM
+
+Algorithm: Kelvin Number System Converter
+
+Step 1: Start the application.
+
+Step 2: Define the digit symbols:
+        0,1,2,3,4,5,6,7,8,9,A,B,C,D,E,F.
+
+Step 3: Define the supported bases:
+        Binary = 2
+        Octal = 8
+        Decimal = 10
+        Hexadecimal = 16.
+
+Step 4: Set the maximum generated fractional digits to 16.
+
+Step 5: Set the default source base to Binary (2).
+
+Step 6: Set the default target base to Octal (8).
+
+Step 7: Display the user interface containing:
+        - Source-base buttons
+        - Target-base buttons
+        - Input field
+        - Result field
+        - Conversion table
+        - Copy Result button
+        - Reverse Direction button
+        - Clear button
+        - Keypad
+        - Show Working section
+
+Step 8: Wait for a user action.
+
+Step 9: If the user selects a source base:
+        a. Change the source base.
+        b. If the selected source base is the current target base,
+           swap the source and target bases.
+        c. Update the labels and placeholder.
+        d. Rebuild the keypad so that only valid digits are enabled.
+        e. Recalculate the result.
+
+Step 10: If the user selects a target base:
+         a. Change the target base.
+         b. If the selected target base is the current source base,
+            swap the two bases.
+         c. Update the interface.
+         d. Recalculate the result.
+
+Step 11: When the user enters a value:
+         a. Remove leading/trailing spaces.
+         b. Convert letters to uppercase.
+         c. Check whether the input is empty.
+         d. Allow one optional + or - sign.
+         e. Check that there is no more than one decimal/radix point.
+         f. Check every digit against the selected source base.
+
+Step 12: If the input is empty:
+         a. Display the normal digit hint.
+         b. Display a blank result indicator.
+         c. Clear the conversion table.
+         d. Display "Enter a value to see each step."
+
+Step 13: If the input is invalid:
+         a. Mark the input as invalid.
+         b. Display the appropriate error message.
+         c. Clear the result.
+         d. Clear the conversion table.
+         e. Display "Fix the input to see the working."
+
+Step 14: If the input is valid:
+         a. Separate the input into whole and fractional parts.
+         b. Remember whether the number is negative.
+
+Step 15: Convert the whole part from the source base to decimal using
+         positional expansion:
+         value = value × sourceBase + digitValue.
+
+Step 16: Convert the fractional part to decimal, when present, by repeatedly
+         multiplying the digit value by decreasing powers of the source base.
+
+Step 17: Convert the decimal whole-number value to the target base:
+         a. Divide the decimal value by the target base.
+         b. Record the remainder.
+         c. Replace the number with the quotient.
+         d. Repeat until the quotient is zero.
+         e. Read the remainders from bottom to top.
+
+Step 18: Convert the decimal fractional part to the target base, when present:
+         a. Multiply the fraction by the target base.
+         b. Take the whole-number portion as the next digit.
+         c. Subtract that whole-number portion.
+         d. Repeat until the fraction becomes zero or 16 digits are produced.
+
+Step 19: Add the negative sign if the original value was negative.
+
+Step 20: Join the whole and fractional results and display the final answer.
+
+Step 21: Convert the input to Binary, Octal, Decimal, and Hexadecimal and
+         display the four values in the conversion table.
+
+Step 22: Generate the working steps:
+         a. Show positional expansion.
+         b. Show the decimal whole value.
+         c. Show fractional conversion when present.
+         d. Show repeated division for the target base when applicable.
+         e. Show fractional multiplication when applicable.
+         f. Show binary grouping shortcuts when applicable.
+         g. Show the final result.
+
+Step 23: If the user selects Reverse Direction:
+         a. Swap source and target bases.
+         b. Put the previous result into the input field.
+         c. Recalculate the conversion.
+
+Step 24: If the user selects Clear:
+         a. Clear the input.
+         b. Clear the result.
+         c. Clear the conversion table.
+         d. Reset the working message.
+         e. Return focus to the input.
+
+Step 25: If the user selects Copy Result:
+         a. If there is no result, do nothing.
+         b. Otherwise copy the result to the clipboard.
+         c. Temporarily display "Copied".
+
+Step 26: Continue waiting for user actions.
+
+Step 27: Repeat Steps 9-25 until the application is closed.
+
+Step 28: Stop.
+
+3. COMPLETE PSEUDOCODE
+
+BEGIN PROGRAM "Kelvin Number System Converter"
+
+    DEFINE DIGITS = "0123456789ABCDEF"
+
+    DEFINE BASES = [2, 8, 10, 16]
+
+    DEFINE NAME[2]  = "Binary"
+    DEFINE NAME[8]  = "Octal"
+    DEFINE NAME[10] = "Decimal"
+    DEFINE NAME[16] = "Hexadecimal"
+
+    DEFINE SHORT[2]  = "BIN"
+    DEFINE SHORT[8]  = "OCT"
+    DEFINE SHORT[10] = "DEC"
+    DEFINE SHORT[16] = "HEX"
+
+    DEFINE FRAC_LIMIT = 16
+
+    sourceBase ← 2
+    targetBase ← 8
+
+    input ← ""
+    result ← "—"
+
+
+    FUNCTION DigitValue(ch)
+        ch ← UPPERCASE(ch)
+        RETURN POSITION_OF(ch, DIGITS)
+    END FUNCTION
+
+
+    FUNCTION DigitSymbol(value)
+        RETURN DIGITS[value]
+    END FUNCTION
+
+
+    FUNCTION Validate(raw, base)
+
+        s ← TRIM(raw)
+        s ← UPPERCASE(s)
+
+        IF s = "" THEN
+            RETURN {valid: FALSE, empty: TRUE}
+        END IF
+
+        negative ← FALSE
+
+        IF FIRST_CHARACTER(s) = "+" THEN
+            REMOVE_FIRST_CHARACTER(s)
+
+        ELSE IF FIRST_CHARACTER(s) = "-" THEN
+            negative ← TRUE
+            REMOVE_FIRST_CHARACTER(s)
+        END IF
+
+        parts ← SPLIT(s, ".")
+
+        IF LENGTH(parts) > 2 THEN
+            RETURN {
+                valid: FALSE,
+                message: "Only one point is allowed."
+            }
+        END IF
+
+        IF parts[0] = "" AND
+           (LENGTH(parts) = 1 OR parts[1] = "") THEN
+
+            RETURN {
+                valid: FALSE,
+                message: "Enter at least one digit."
+            }
+        END IF
+
+        FOR EACH ch IN s
+
+            IF ch = "." THEN
+                CONTINUE
+            END IF
+
+            v ← DigitValue(ch)
+
+            IF v < 0 OR v >= base THEN
+                RETURN {
+                    valid: FALSE,
+                    message: ch + " is not a valid " +
+                             NAME[base] + " digit."
+                }
+            END IF
+
+        END FOR
+
+        wholePart ← parts[0]
+
+        IF wholePart = "" THEN
+            wholePart ← "0"
+        END IF
+
+        IF LENGTH(parts) = 2 THEN
+            fractionPart ← parts[1]
+        ELSE
+            fractionPart ← ""
+        END IF
+
+        RETURN {
+            valid: TRUE,
+            negative: negative,
+            wholePart: wholePart,
+            fractionPart: fractionPart
+        }
+
+    END FUNCTION
+
+
+    FUNCTION IntToDecimal(str, base)
+
+        value ← 0
+
+        FOR EACH ch IN str
+
+            digit ← DigitValue(ch)
+
+            value ← value × base + digit
+
+        END FOR
+
+        RETURN value
+
+    END FUNCTION
+
+
+    FUNCTION FractionToDecimal(str, base)
+
+        value ← 0
+        power ← 1 / base
+
+        FOR EACH ch IN str
+
+            digit ← DigitValue(ch)
+
+            value ← value + digit × power
+
+            power ← power / base
+
+        END FOR
+
+        RETURN value
+
+    END FUNCTION
+
+
+    FUNCTION DecimalToInt(number, base)
+
+        IF number = 0 THEN
+            RETURN "0"
+        END IF
+
+        output ← ""
+
+        WHILE number > 0
+
+            remainder ← number MOD base
+
+            output ← DigitSymbol(remainder) + output
+
+            number ← number DIV base
+
+        END WHILE
+
+        RETURN output
+
+    END FUNCTION
+
+
+    FUNCTION DecimalToFraction(fraction, base)
+
+        output ← ""
+        count ← 0
+
+        WHILE fraction > 0 AND count < FRAC_LIMIT
+
+            fraction ← fraction × base
+
+            digit ← FLOOR(fraction)
+
+            output ← output + DigitSymbol(digit)
+
+            fraction ← fraction - digit
+
+            count ← count + 1
+
+        END WHILE
+
+        RETURN output
+
+    END FUNCTION
+
+
+    FUNCTION Render(value, fromBase, toBase)
+
+        whole ← IntToDecimal(
+                    value.wholePart,
+                    fromBase
+                 )
+
+        IF value.fractionPart ≠ "" THEN
+            fraction ← FractionToDecimal(
+                           value.fractionPart,
+                           fromBase
+                       )
+        ELSE
+            fraction ← 0
+        END IF
+
+        outputWhole ← DecimalToInt(
+                          whole,
+                          toBase
+                      )
+
+        IF fraction > 0 THEN
+            outputFraction ← DecimalToFraction(
+                                 fraction,
+                                 toBase
+                             )
+        ELSE
+            outputFraction ← ""
+        END IF
+
+        result ← outputWhole
+
+        IF outputFraction ≠ "" THEN
+            result ← result + "." + outputFraction
+        END IF
+
+        IF value.negative = TRUE THEN
+            result ← "-" + result
+        END IF
+
+        RETURN result
+
+    END FUNCTION
+
+
+    FUNCTION Expansion(str, base)
+
+        terms ← EMPTY_LIST
+
+        n ← LENGTH(str)
+
+        FOR i ← 0 TO n - 1
+
+            digit ← DigitValue(str[i])
+
+            exponent ← n - 1 - i
+
+            ADD digit + " × " + base + "^" + exponent
+            TO terms
+
+        END FOR
+
+        RETURN JOIN(terms, " + ")
+
+    END FUNCTION
+
+
+    FUNCTION DivisionSteps(number, base)
+
+        steps ← EMPTY_LIST
+
+        IF number = 0 THEN
+
+            ADD "0 ÷ " + base +
+                " = 0 remainder 0"
+            TO steps
+
+            RETURN steps
+
+        END IF
+
+        guard ← 0
+
+        WHILE number > 0 AND guard < 400
+
+            quotient ← number DIV base
+
+            remainder ← number MOD base
+
+            ADD number + " ÷ " + base +
+                " = " + quotient +
+                " remainder " +
+                DigitSymbol(remainder)
+            TO steps
+
+            number ← quotient
+
+            guard ← guard + 1
+
+        END WHILE
+
+        ADD "Read the remainders bottom to top."
+        TO steps
+
+        RETURN steps
+
+    END FUNCTION
+
+
+    FUNCTION GroupNote(fromBase, toBase)
+
+        IF fromBase = 2 AND toBase = 8 THEN
+            RETURN "Group binary bits in threes from the point outwards."
+
+        ELSE IF fromBase = 2 AND toBase = 16 THEN
+            RETURN "Group binary bits in fours from the point outwards."
+
+        ELSE IF fromBase = 8 AND toBase = 2 THEN
+            RETURN "Expand every octal digit into 3 binary bits."
+
+        ELSE IF fromBase = 16 AND toBase = 2 THEN
+            RETURN "Expand every hexadecimal digit into 4 binary bits."
+
+        ELSE IF fromBase = 8 AND toBase = 16 THEN
+            RETURN "Convert octal to binary in groups of three, then regroup in fours."
+
+        ELSE IF fromBase = 16 AND toBase = 8 THEN
+            RETURN "Convert hexadecimal to binary in groups of four, then regroup in threes."
+
+        ELSE
+            RETURN NONE
+        END IF
+
+    END FUNCTION
+
+
+    FUNCTION BuildSteps(value, fromBase, toBase, finalResult)
+
+        lines ← EMPTY_LIST
+
+        whole ← IntToDecimal(
+                    value.wholePart,
+                    fromBase
+                 )
+
+        IF fromBase ≠ 10 THEN
+
+            ADD "Expand by place value: " +
+                Expansion(value.wholePart, fromBase)
+            TO lines
+
+            ADD "Whole part in decimal = " + whole
+            TO lines
+
+        ELSE
+
+            ADD "Whole part is already decimal: " +
+                whole
+            TO lines
+
+        END IF
+
+
+        IF value.fractionPart ≠ "" THEN
+
+            fraction ← FractionToDecimal(
+                           value.fractionPart,
+                           fromBase
+                       )
+
+            ADD "Fraction in decimal ≈ " +
+                FORMAT(fraction, 8 decimal places)
+            TO lines
+
+        END IF
+
+
+        IF toBase ≠ 10 THEN
+
+            ADD "Divide the whole part by " +
+                toBase +
+                ", keeping remainders:"
+            TO lines
+
+            divisionLines ← DivisionSteps(
+                                whole,
+                                toBase
+                            )
+
+            FOR EACH line IN divisionLines
+                ADD line TO lines
+            END FOR
+
+            IF value.fractionPart ≠ "" THEN
+
+                ADD "Multiply the fraction by " +
+                    toBase +
+                    " repeatedly and read the whole parts downwards."
+                TO lines
+
+            END IF
+
+        ELSE
+
+            ADD "The target is decimal, so the expanded value is the answer."
+            TO lines
+
+        END IF
+
+
+        note ← GroupNote(fromBase, toBase)
+
+        IF note EXISTS THEN
+            ADD note TO lines
+        END IF
+
+
+        ADD "Result: " +
+            finalResult +
+            " in " +
+            LOWERCASE(NAME[toBase]) +
+            "."
+        TO lines
+
+        RETURN lines
+
+    END FUNCTION
+
+
+    FUNCTION Convert(text, fromBase, toBase)
+
+        value ← Validate(text, fromBase)
+
+        IF value.valid = FALSE THEN
+
+            IF value.empty = TRUE THEN
+                RETURN "—"
+            ELSE
+                DISPLAY value.message
+                RETURN "ERROR"
+            END IF
+
+        END IF
+
+        RETURN Render(
+                   value,
+                   fromBase,
+                   toBase
+               )
+
+    END FUNCTION
+
+
+    FUNCTION FillTable(value)
+
+        IF value is EMPTY THEN
+
+            DISPLAY "—" for Binary
+            DISPLAY "—" for Octal
+            DISPLAY "—" for Decimal
+            DISPLAY "—" for Hexadecimal
+
+            RETURN
+
+        END IF
+
+        FOR EACH base IN [2, 8, 10, 16]
+
+            converted ← Render(
+                            value,
+                            sourceBase,
+                            base
+                         )
+
+            DISPLAY converted
+            in the row for that base
+
+        END FOR
+
+    END FUNCTION
+
+
+    FUNCTION Run()
+
+        value ← Validate(
+                    input,
+                    sourceBase
+                )
+
+        IF value.empty = TRUE THEN
+
+            result ← "—"
+
+            DISPLAY normal digit hint
+
+            CLEAR conversion table
+
+            DISPLAY:
+                "Enter a value to see each step."
+
+            RETURN
+
+        END IF
+
+
+        IF value.valid = FALSE THEN
+
+            DISPLAY error message
+
+            result ← "—"
+
+            CLEAR conversion table
+
+            DISPLAY:
+                "Fix the input to see the working."
+
+            RETURN
+
+        END IF
+
+
+        result ← Render(
+                     value,
+                     sourceBase,
+                     targetBase
+                 )
+
+
+        DISPLAY result
+
+
+        FillTable(value)
+
+
+        steps ← BuildSteps(
+                     value,
+                     sourceBase,
+                     targetBase,
+                     result
+                 )
+
+
+        DISPLAY every step in steps
+
+    END FUNCTION
+
+
+    FUNCTION BuildKeypad()
+
+        CLEAR keypad
+
+        FOR i ← 0 TO 15
+
+            CREATE button containing DIGITS[i]
+
+            IF i >= sourceBase THEN
+                DISABLE button
+            ELSE
+                ENABLE button
+            END IF
+
+            WHEN button is clicked
+                input ← input + DIGITS[i]
+                Run()
+            END WHEN
+
+        END FOR
+
+
+        CREATE decimal point button
+
+        WHEN decimal point is clicked
+            input ← input + "."
+            Run()
+        END WHEN
+
+
+        CREATE delete button
+
+        WHEN delete is clicked
+            input ← REMOVE_LAST_CHARACTER(input)
+            Run()
+        END WHEN
+
+    END FUNCTION
+
+
+    FUNCTION SelectBase(side, base)
+
+        IF side = "source" THEN
+
+            IF base = targetBase THEN
+
+                temporary ← targetBase
+                targetBase ← sourceBase
+                sourceBase ← temporary
+
+            ELSE
+
+                sourceBase ← base
+
+            END IF
+
+        ELSE IF side = "target" THEN
+
+            IF base = sourceBase THEN
+
+                temporary ← sourceBase
+                sourceBase ← targetBase
+                targetBase ← temporary
+
+            ELSE
+
+                targetBase ← base
+
+            END IF
+
+        END IF
+
+
+        UPDATE source and target labels
+
+        UPDATE input placeholder
+
+        BuildKeypad()
+
+        Run()
+
+    END FUNCTION
+
+
+    --------------------------------------------------
+    MAIN APPLICATION LOOP
+    --------------------------------------------------
+
+    BUILD source-base controls
+
+    BUILD target-base controls
+
+    BUILD keypad
+
+    Run()
+
+
+    REPEAT FOREVER
+
+        WAIT FOR USER ACTION
+
+
+        IF action = "SOURCE BASE SELECTED" THEN
+
+            SelectBase("source", selectedBase)
+
+
+        ELSE IF action = "TARGET BASE SELECTED" THEN
+
+            SelectBase("target", selectedBase)
+
+
+        ELSE IF action = "INPUT CHANGED" THEN
+
+            input ← CURRENT_INPUT_VALUE
+
+            Run()
+
+
+        ELSE IF action = "REVERSE" THEN
+
+            oldResult ← result
+
+            temporary ← sourceBase
+
+            sourceBase ← targetBase
+
+            targetBase ← temporary
+
+            IF oldResult ≠ "—" THEN
+                input ← oldResult
+            END IF
+
+            UPDATE interface
+
+            BuildKeypad()
+
+            Run()
+
+
+        ELSE IF action = "CLEAR" THEN
+
+            input ← ""
+
+            result ← "—"
+
+            CLEAR input field
+
+            DISPLAY "—" as result
+
+            CLEAR conversion table
+
+            DISPLAY:
+                "Enter a value to see each step."
+
+            FOCUS input field
+
+
+        ELSE IF action = "COPY" THEN
+
+            IF result ≠ "—" AND result ≠ "" THEN
+
+                COPY result TO CLIPBOARD
+
+                DISPLAY "Copied"
+
+                WAIT briefly
+
+                DISPLAY "Copy Result"
+
+            END IF
+
+
+        ELSE IF action = "KEYPAD DIGIT" THEN
+
+            input ← input + selectedDigit
+
+            Run()
+
+
+        ELSE IF action = "KEYPAD DECIMAL POINT" THEN
+
+            input ← input + "."
+
+            Run()
+
+
+        ELSE IF action = "KEYPAD DELETE" THEN
+
+            input ← REMOVE_LAST_CHARACTER(input)
+
+            Run()
+
+        END IF
+
+    UNTIL APPLICATION IS CLOSED
+
+
+END PROGRAM
